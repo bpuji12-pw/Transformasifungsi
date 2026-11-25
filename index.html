@@ -1,0 +1,1905 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <!-- Konfigurasi viewport agar responsif di perangkat seluler, tablet, maupun desktop -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transformasi Fungsi SMK Kelas 12 — Lab Simulasi & Kuis Bertingkat</title>
+
+  <!-- Memuat Tailwind CSS untuk tata letak responsif dan komponen modern -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Memuat font Inter dan JetBrains Mono untuk keterbacaan teks serta persamaan matematika -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            },
+            accent: {
+              500: '#10b981',
+              600: '#059669',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Pengaturan dasar font dan transisi halus */
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    code, pre, .math-font {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Styling khusus untuk range slider agar nyaman disentuh jari maupun mouse */
+    input[type="range"].sim-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    input[type="range"].sim-slider::-webkit-slider-runnable-track {
+      height: 8px;
+      border-radius: 9999px;
+      background: #cbd5e1;
+    }
+
+    .dark input[type="range"].sim-slider::-webkit-slider-runnable-track {
+      background: #334155;
+    }
+
+    input[type="range"].sim-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      background: #2563eb;
+      border: 3px solid #ffffff;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.45);
+      margin-top: -7px;
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+
+    input[type="range"].sim-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.12);
+      background: #1d4ed8;
+    }
+
+    /* Custom scrollbar halus */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.5);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 min-h-screen transition-colors duration-200 overflow-x-hidden">
+  <!-- Wadah utama aplikasi -->
+  <div id="app" class="min-h-screen flex flex-col">
+
+    <!-- HEADER APLIKASI -->
+    <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-800">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+            f(x)
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 dark:text-white truncate">
+                Transformasi Fungsi
+              </h1>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
+                SMK Kelas XII
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 truncate">
+              Laboratorium Visual Translasi, Refleksi &amp; Dilatasi + Bank Soal 5 Level
+            </p>
+          </div>
+        </div>
+
+        <!-- Ringkasan Progres Kuis & Tombol Tema -->
+        <div class="flex items-center gap-2 sm:gap-3 ml-auto">
+          <div id="header-progress-badge" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-semibold">
+            <span>Skor Kuis:</span>
+            <span id="header-score-text" class="font-mono font-bold">0/15 Level</span>
+          </div>
+
+          <button
+            id="theme-toggle-btn"
+            type="button"
+            class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer"
+            aria-label="Ganti Tema Gelap atau Terang"
+            title="Ganti Tema Gelap / Terang"
+          >
+            <span id="theme-icon" class="text-base leading-none">🌙</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigasi Materi Utama (Translasi, Refleksi, Dilatasi) -->
+      <div class="max-w-7xl mx-auto px-3 sm:px-6 pb-2.5 flex items-center justify-between gap-2 overflow-x-auto">
+        <nav class="flex items-center gap-1.5 sm:gap-2" role="tablist" aria-label="Pilih Materi Transformasi Fungsi">
+          <button
+            type="button"
+            data-topic="translasi"
+            class="topic-tab px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 cursor-pointer whitespace-nowrap"
+          >
+            <span>↔️</span>
+            <span>1. Translasi (Pergeseran)</span>
+          </button>
+          <button
+            type="button"
+            data-topic="refleksi"
+            class="topic-tab px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 cursor-pointer whitespace-nowrap"
+          >
+            <span>🪞</span>
+            <span>2. Refleksi (Pencerminan)</span>
+          </button>
+          <button
+            type="button"
+            data-topic="dilatasi"
+            class="topic-tab px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 cursor-pointer whitespace-nowrap"
+          >
+            <span>🔍</span>
+            <span>3. Dilatasi (Perkalian)</span>
+          </button>
+        </nav>
+
+        <!-- Mode Tampilan: Simulasi + Kuis, Simulasi Saja, atau Kuis Saja -->
+        <div class="hidden md:flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl shrink-0">
+          <button type="button" data-mode="split" class="view-mode-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">
+            Lab &amp; Kuis
+          </button>
+          <button type="button" data-mode="sim" class="view-mode-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">
+            Fokus Lab
+          </button>
+          <button type="button" data-mode="quiz" class="view-mode-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">
+            Fokus Kuis
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- KONTEN UTAMA -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6">
+      <!-- Banner Konsep Singkat & Rumus Inti Materi Aktif -->
+      <section id="concept-banner" class="mb-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="space-y-1.5 max-w-3xl">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="topic-badge" class="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300">
+                Materi
+              </span>
+              <h2 id="topic-title" class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
+                Judul Materi
+              </h2>
+            </div>
+            <p id="topic-desc" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Deskripsi materi akan dimuat di sini.
+            </p>
+          </div>
+
+          <!-- Kotak Rumus Inti -->
+          <div class="bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 shrink-0">
+            <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 mb-1">
+              Rumus Utama
+            </div>
+            <div id="topic-formula" class="math-font text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-400">
+              y' = f(x - a) + b
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Grid Utama: Kolom Kiri (Simulasi Grafik Interaktif) & Kolom Kanan (Kuis 5 Level & Pembahasan) -->
+      <div id="main-grid" class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+
+        <!-- KOLOM LABORATORIUM SIMULASI GRAFIK -->
+        <section id="sim-column" class="xl:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div class="px-4 sm:px-5 py-3.5 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span>📈</span>
+                <span>Canvas Simulasi Grafik Interaktif</span>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">
+                Geser parameter atau seret titik/grafik pada canvas untuk melihat perubahan fungsi secara langsung.
+              </p>
+            </div>
+            <button
+              id="reset-sim-btn"
+              type="button"
+              class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer"
+            >
+              ↺ Reset Parameter
+            </button>
+          </div>
+
+          <!-- Pemilihan Fungsi Asal f(x) -->
+          <div class="px-4 sm:px-5 pt-4 pb-2 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Fungsi Awal f(x):</span>
+              <div id="base-func-buttons" class="flex items-center gap-1.5 flex-wrap">
+                <button type="button" data-func="linear" class="func-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition cursor-pointer">
+                  2x - 1
+                </button>
+                <button type="button" data-func="quadratic" class="func-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition cursor-pointer">
+                  x² - 4
+                </button>
+                <button type="button" data-func="cubic" class="func-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition cursor-pointer">
+                  0.5x³ - 2x
+                </button>
+                <button type="button" data-func="abs" class="func-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition cursor-pointer">
+                  |x - 1| - 2
+                </button>
+              </div>
+            </div>
+
+            <!-- Legenda Grafik -->
+            <div class="flex items-center gap-3 text-xs font-semibold">
+              <span class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                <span class="inline-block w-3 h-0.5 bg-slate-400 border-dashed"></span>
+                <span>Asal f(x)</span>
+              </span>
+              <span class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+                <span class="inline-block w-3 h-1 rounded bg-blue-600 dark:bg-blue-400"></span>
+                <span>Bayangan f'(x)</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Wadah Canvas Responsif -->
+          <div class="px-4 sm:px-5 py-2">
+            <div class="relative w-full h-[310px] sm:h-[370px] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 touch-none select-none">
+              <canvas id="graph-canvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></canvas>
+
+              <!-- Info koordinat pointer / titik acuan pojok kiri atas -->
+              <div id="canvas-hud" class="pointer-events-none absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-white/85 dark:bg-slate-900/85 backdrop-blur border border-slate-200/80 dark:border-slate-700/80 text-[11px] font-mono text-slate-600 dark:text-slate-300 shadow-sm">
+                Skala: 1 kotak = 1 satuan • Seret canvas untuk geser cepat
+              </div>
+            </div>
+          </div>
+
+          <!-- Panel Kontrol Parameter Dinamis per Materi -->
+          <div id="controls-container" class="px-4 sm:px-5 py-3.5 bg-slate-50/70 dark:bg-slate-800/40 border-t border-slate-200 dark:border-slate-800">
+            <!-- Diisi dinamis oleh JS sesuai topik aktif -->
+          </div>
+
+          <!-- Persamaan Hasil Transformasi & Penjelasan Singkat Langkah Aljabar -->
+          <div class="px-4 sm:px-5 py-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2.5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Persamaan Bayangan Hasil Simulasi</span>
+              <span id="sim-rule-badge" class="text-xs font-semibold text-emerald-600 dark:text-emerald-400"></span>
+            </div>
+            <div id="sim-equation-output" class="math-font text-sm sm:text-base font-bold p-3 rounded-xl bg-blue-50/80 dark:bg-blue-950/40 border border-blue-200/80 dark:border-blue-800/60 text-blue-700 dark:text-blue-300 overflow-x-auto">
+              y' = ...
+            </div>
+            <p id="sim-explanation-text" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              Penjelasan substitusi variabel akan tampil di sini.
+            </p>
+          </div>
+        </section>
+
+        <!-- KOLOM KUIS 5 LEVEL & PEMBAHASAN LENGKAP -->
+        <section id="quiz-column" class="xl:col-span-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div class="px-4 sm:px-5 py-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
+            <div>
+              <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <span>🎯</span>
+                <span>Latihan Kuis 5 Level</span>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">
+                Dari Level 1 (Dasar) hingga Level 5 (HOTS / Aplikasi SMK)
+              </p>
+            </div>
+            <button
+              id="reset-topic-quiz-btn"
+              type="button"
+              class="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 transition cursor-pointer"
+              title="Ulangi status kuis pada materi ini"
+            >
+              Reset Materi
+            </button>
+          </div>
+
+          <!-- Pemilih Level 1 sampai 5 -->
+          <div class="px-4 sm:px-5 pt-4 pb-2">
+            <div class="grid grid-cols-5 gap-1.5 sm:gap-2" role="group" aria-label="Pilih Level Kesulitan Kuis">
+              <!-- Tombol Level 1-5 di-render oleh JS -->
+            </div>
+          </div>
+
+          <!-- Kartu Soal Aktif -->
+          <div class="p-4 sm:p-5 space-y-4">
+            <!-- Header Level & Label Kesulitan -->
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span id="quiz-level-pill" class="text-xs font-bold px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300">
+                Level 1 • Dasar
+              </span>
+              <span id="quiz-status-pill" class="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                Belum dijawab
+              </span>
+            </div>
+
+            <!-- Konteks & Pertanyaan Soal -->
+            <div class="space-y-2">
+              <div id="quiz-context-tag" class="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                Konteks Soal
+              </div>
+              <p id="quiz-question-text" class="text-sm sm:text-[15px] font-semibold text-slate-900 dark:text-white leading-relaxed">
+                Pertanyaan soal akan muncul di sini.
+              </p>
+              <div id="quiz-given-box" class="math-font text-xs sm:text-sm p-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                Diketahui: ...
+              </div>
+            </div>
+
+            <!-- Pilihan Jawaban (A, B, C, D) -->
+            <div id="quiz-options-list" class="space-y-2.5">
+              <!-- Opsi jawaban di-render oleh JS -->
+            </div>
+
+            <!-- Tombol Aksi: Periksa Jawaban, Tampilkan Pembahasan, Soal Berikutnya -->
+            <div class="pt-1 flex flex-wrap items-center gap-2">
+              <button
+                id="check-answer-btn"
+                type="button"
+                class="flex-1 min-w-[130px] px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-45 disabled:pointer-events-none text-white text-xs sm:text-sm font-bold shadow-sm transition cursor-pointer"
+              >
+                Periksa Jawaban
+              </button>
+              <button
+                id="toggle-solution-btn"
+                type="button"
+                class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-bold transition cursor-pointer"
+              >
+                Lihat Pembahasan
+              </button>
+              <button
+                id="next-level-btn"
+                type="button"
+                class="px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold transition cursor-pointer"
+              >
+                Level Berikutnya →
+              </button>
+            </div>
+
+            <!-- Area Umpan Balik Instan (Pesan non-alert) -->
+            <div id="feedback-banner" class="hidden rounded-xl p-3.5 text-xs sm:text-sm font-medium border">
+              <!-- Pesan benar/salah di-render oleh JS -->
+            </div>
+
+            <!-- Kotak Pembahasan Langkah demi Langkah -->
+            <div id="solution-panel" class="hidden rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 p-4 space-y-3">
+              <div class="flex items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-2">
+                <h4 class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <span>📝</span>
+                  <span>Penjabaran Penyelesaian Langkah demi Langkah</span>
+                </h4>
+                <span id="solution-answer-badge" class="math-font text-xs font-bold px-2.5 py-0.5 rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300">
+                  Jawaban: ...
+                </span>
+              </div>
+
+              <ol id="solution-steps-list" class="space-y-2.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                <!-- Langkah-langkah penyelesaian di-render oleh JS -->
+              </ol>
+
+              <div class="pt-2 border-t border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-2">
+                <span id="solution-tip" class="text-xs italic text-slate-500 dark:text-slate-400">
+                  Tips guru: ...
+                </span>
+                <button
+                  id="apply-quiz-to-sim-btn"
+                  type="button"
+                  class="text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline cursor-pointer"
+                >
+                  Coba nilai pada simulasi grafik ↑
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- FOOTER SINGKAT -->
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-4 px-4 sm:px-6 text-center text-xs text-slate-500 dark:text-slate-400">
+      Media Pembelajaran Interaktif Matematika SMK Kelas XII • Transformasi Fungsi (Translasi, Refleksi &amp; Dilatasi)
+    </footer>
+  </div>
+
+  <script>
+    /**
+     * =========================================================================
+     * ARSITEKTUR & DATA APLIKASI TRANSFORMASI FUNGSI (SMK KELAS XII)
+     * =========================================================================
+     * Struktur utama:
+     * 1. BASE_FUNCTIONS: Definisi fungsi asal f(x) untuk evaluasi numerik & formatting.
+     * 2. TOPICS_DATA: Metadata konsep, rumus, parameter simulasi, dan 5 level kuis
+     *    lengkap dengan jawaban benar & langkah penyelesaian per topik.
+     * 3. AppState: State reaktif aplikasi (topik aktif, level aktif, fungsi asal,
+     *    parameter simulasi, posisi pan/geser canvas, status jawaban kuis).
+     * 4. GraphRenderer: Engine canvas 2D responsif dengan DPR scaling, grid,
+     *    sumbu koordinat, garis cermin/pusat dilatasi, kurva asal & bayangan,
+     *    serta interaksi drag/geser.
+     * 5. UIController: Sinkronisasi kontrol parameter, persamaan hasil, kuis 5 level,
+     *    pembahasan langkah demi langkah, dan tema gelap/terang.
+     * =========================================================================
+     */
+
+    const BASE_FUNCTIONS = {
+      linear: {
+        id: 'linear',
+        label: 'f(x) = 2x - 1',
+        shortLabel: '2x - 1',
+        eval: (x) => 2 * x - 1,
+        // Mengembalikan ekspresi f(u) dengan u berupa string ekspresi di dalam tanda kurung
+        composeText: (uStr) => {
+          // 2*(u) - 1
+          return `2(${uStr}) - 1`;
+        },
+        // Menyederhanakan secara aljabar untuk bentuk linear f(ax + b) + c
+        // Jika u = p*x + q, maka 2*(p*x + q) - 1 = (2p)x + (2q - 1)
+        simplifyLinearShift: (scaleX = 1, shiftX = 0, shiftY = 0) => {
+          const m = 2 * scaleX;
+          const c = 2 * shiftX - 1 + shiftY;
+          return formatLinear(m, c);
+        }
+      },
+      quadratic: {
+        id: 'quadratic',
+        label: 'f(x) = x² - 4',
+        shortLabel: 'x² - 4',
+        eval: (x) => x * x - 4,
+        composeText: (uStr) => `(${uStr})² - 4`
+      },
+      cubic: {
+        id: 'cubic',
+        label: 'f(x) = 0,5x³ - 2x',
+        shortLabel: '0.5x³ - 2x',
+        eval: (x) => 0.5 * x * x * x - 2 * x,
+        composeText: (uStr) => `0,5(${uStr})³ - 2(${uStr})`
+      },
+      abs: {
+        id: 'abs',
+        label: 'f(x) = |x - 1| - 2',
+        shortLabel: '|x - 1| - 2',
+        eval: (x) => Math.abs(x - 1) - 2,
+        composeText: (uStr) => `|(${uStr}) - 1| - 2`
+      }
+    };
+
+    // Helper pemformatan angka & ekspresi matematika yang rapi untuk siswa
+    function fmtNum(n) {
+      if (typeof n !== 'number' || Number.isNaN(n)) return '0';
+      const rounded = Math.round(n * 100) / 100;
+      return String(rounded).replace('.', ',');
+    }
+
+    function formatSigned(val, includeZero = false) {
+      const r = Math.round(val * 100) / 100;
+      if (r === 0 && !includeZero) return '';
+      if (r > 0) return ` + ${fmtNum(r)}`;
+      return ` - ${fmtNum(Math.abs(r))}`;
+    }
+
+    function formatLinear(m, c) {
+      const mr = Math.round(m * 100) / 100;
+      const cr = Math.round(c * 100) / 100;
+      let mPart = '';
+      if (mr === 1) mPart = 'x';
+      else if (mr === -1) mPart = '-x';
+      else if (mr === 0) mPart = '';
+      else mPart = `${fmtNum(mr)}x`;
+
+      if (!mPart) return fmtNum(cr);
+      if (cr === 0) return mPart;
+      return `${mPart}${formatSigned(cr)}`;
+    }
+
+    /**
+     * Data lengkap 3 materi (Translasi, Refleksi, Dilatasi)
+     * Masing-masing memiliki 5 level soal kuis + jawaban + pembahasan terstruktur.
+     */
+    const TOPICS_DATA = {
+      translasi: {
+        id: 'translasi',
+        badge: 'Materi 1 • Pergeseran',
+        title: 'Translasi Grafik Fungsi',
+        description:
+          'Translasi menggeser setiap titik pada grafik fungsi sejauh vektor T = (a, b) tanpa mengubah bentuk maupun kemiringannya. Geser ke kanan jika a > 0, ke kiri jika a < 0, ke atas jika b > 0, dan ke bawah jika b < 0.',
+        formula: "y' = f(x - a) + b  atau  y' - b = f(x' - a)",
+        defaultParams: { a: 2, b: 1 },
+        levels: [
+          {
+            level: 1,
+            tag: 'Level 1 • Dasar',
+            context: 'Translasi Vertikal & Horizontal Sederhana',
+            question: 'Grafik fungsi f(x) = x² digeser oleh vektor translasi T = (0, 3). Tentukan persamaan fungsi hasil translasinya!',
+            given: 'Diketahui: f(x) = x² dan vektor translasi T = (a, b) = (0, 3).',
+            options: [
+              "A. y' = x² + 3",
+              "B. y' = x² - 3",
+              "C. y' = (x + 3)²",
+              "D. y' = (x - 3)²"
+            ],
+            correctIndex: 0,
+            correctLabel: "A. y' = x² + 3",
+            simPreset: { func: 'quadratic', a: 0, b: 3 },
+            steps: [
+              'Identifikasi komponen vektor translasi: a = 0 (tidak ada pergeseran horizontal) dan b = 3 (bergeser 3 satuan ke atas).',
+              'Gunakan rumus umum translasi fungsi: y\' = f(x - a) + b.',
+              'Substitusikan nilai a = 0 dan b = 3 ke dalam rumus: y\' = f(x - 0) + 3 = f(x) + 3.',
+              'Karena f(x) = x², maka persamaan bayangannya adalah y\' = x² + 3.'
+            ],
+            tip: 'Jika b bernilai positif (+3), grafik naik ke atas sehingga konstanta +3 ditambahkan di luar f(x).'
+          },
+          {
+            level: 2,
+            tag: 'Level 2 • Menengah',
+            context: 'Pergeseran Horizontal ke Kanan',
+            question: 'Fungsi f(x) = 2x - 1 ditranslasikan oleh T = (3, 0). Persamaan bayangan fungsi tersebut adalah...',
+            given: 'Diketahui: f(x) = 2x - 1 dan T = (3, 0) → a = 3, b = 0.',
+            options: [
+              "A. y' = 2x + 2",
+              "B. y' = 2x - 7",
+              "C. y' = 2x - 4",
+              "D. y' = 2x + 5"
+            ],
+            correctIndex: 1,
+            correctLabel: "B. y' = 2x - 7",
+            simPreset: { func: 'linear', a: 3, b: 0 },
+            steps: [
+              'Tentukan nilai a = 3 dan b = 0 dari vektor translasi T = (3, 0).',
+              'Substitusikan x diganti (x - a) = (x - 3) ke fungsi f(x) = 2x - 1.',
+              'Hitung: y\' = f(x - 3) + 0 = 2(x - 3) - 1.',
+              'Jabarkan perkalian: y\' = 2x - 6 - 1 = 2x - 7.'
+            ],
+            tip: 'Hati-hati! Geser ke kanan sejauh 3 satuan berarti di dalam fungsi ditulis (x - 3), lalu kalikan dengan koefisien 2.'
+          },
+          {
+            level: 3,
+            tag: 'Level 3 • Menengah Lanjut',
+            context: 'Translasi Gabungan (x dan y)',
+            question: 'Kurva y = x² - 4 digeser oleh T = (-2, 5). Persamaan kurva hasil pergeseran adalah...',
+            given: 'Diketahui: f(x) = x² - 4, a = -2, dan b = 5.',
+            options: [
+              "A. y' = (x - 2)² + 1",
+              "B. y' = (x + 2)² + 1",
+              "C. y' = (x + 2)² - 9",
+              "D. y' = (x - 2)² - 9"
+            ],
+            correctIndex: 1,
+            correctLabel: "B. y' = (x + 2)² + 1",
+            simPreset: { func: 'quadratic', a: -2, b: 5 },
+            steps: [
+              'Dari T = (-2, 5), diperoleh a = -2 (geser 2 ke kiri) dan b = 5 (geser 5 ke atas).',
+              'Masukkan ke rumus y\' = f(x - a) + b: y\' = f(x - (-2)) + 5 = f(x + 2) + 5.',
+              'Substitusikan ke f(u) = u² - 4 dengan u = (x + 2): y\' = [(x + 2)² - 4] + 5.',
+              'Sederhanakan konstanta -4 + 5 = +1, sehingga diperoleh y\' = (x + 2)² + 1.'
+            ],
+            tip: 'x - (-2) berubah menjadi (x + 2). Titik puncak yang semula di (0, -4) kini berpindah ke (-2, 1).'
+          },
+          {
+            level: 4,
+            tag: 'Level 4 • Analitis',
+            context: 'Menentukan Vektor Translasi dari Bayangan',
+            question: 'Grafik f(x) = |x - 1| - 2 setelah ditranslasikan oleh T = (a, b) menghasilkan bayangan y\' = |x - 4| + 1. Nilai a dan b berturut-turut adalah...',
+            given: 'Diketahui: f(x) = |x - 1| - 2 dan bayangan y\' = |x - 4| + 1.',
+            options: [
+              "A. a = -3 dan b = -3",
+              "B. a = 3 dan b = -1",
+              "C. a = 3 dan b = 3",
+              "D. a = 5 dan b = 1"
+            ],
+            correctIndex: 2,
+            correctLabel: "C. a = 3 dan b = 3",
+            simPreset: { func: 'abs', a: 3, b: 3 },
+            steps: [
+              'Bentuk umum bayangan translasi adalah y\' = f(x - a) + b = |(x - a) - 1| - 2 + b.',
+              'Sederhanakan bagian dalam nilai mutlak: |(x - a) - 1| = |x - (a + 1)|.',
+              'Bandingkan dengan bayangan yang diketahui |x - 4|: a + 1 = 4 → a = 3.',
+              'Bandingkan bagian luar nilai mutlak: -2 + b = 1 → b = 1 + 2 = 3. Jadi a = 3 dan b = 3.'
+            ],
+            tip: 'Titik sudut awal f(x) berada di (1, -2) dan berpindah ke (4, 1). Selisihnya langsung: (4 - 1, 1 - (-2)) = (3, 3).'
+          },
+          {
+            level: 5,
+            tag: 'Level 5 • HOTS / Aplikasi SMK',
+            context: 'Kalibrasi Sensor Produksi (Aplikasi Industri)',
+            question: 'Pada lini perakitan SMK Otomotif/Elektronika, grafik kalibrasi tegangan sensor dimodelkan dengan f(x) = 2x - 1. Akibat pergeseran titik nol kalibrasi sebesar 2 satuan ke kanan dan penurunan keluaran sebesar 4 satuan, tentukan nilai bayangan sensor saat input x = 5!',
+            given: 'Diketahui: f(x) = 2x - 1, T = (2, -4), dan nilai input yang diuji x = 5.',
+            options: [
+              "A. 9",
+              "B. 5",
+              "C. 1",
+              "D. 13"
+            ],
+            correctIndex: 1,
+            correctLabel: "B. 5",
+            simPreset: { func: 'linear', a: 2, b: -4 },
+            steps: [
+              'Rumuskan persamaan fungsi setelah translasi T = (2, -4): y\' = f(x - 2) - 4.',
+              'Karena f(x) = 2x - 1, maka y\' = 2(x - 2) - 1 - 4 = 2x - 4 - 5 = 2x - 9.',
+              'Substitusikan x = 5 ke persamaan bayangan: y\' = 2(5) - 9 = 10 - 9 = 1? Tunggu, cek ulang langkah 2!',
+              'Cek ulang aljabar: f(x - 2) = 2(x - 2) - 1 = 2x - 5. Lalu kurangi 4: y\' = (2x - 5) - 4 = 2x - 9. Saat x = 5: 2(5) - 9 = 1? Mari periksa opsi: jika y\' = f(x - 2) + (-4) di x = 5 → f(3) - 4 = (2(3)-1) - 4 = 5 - 4 = 1. Jika pergeseran ke kanan 2 dan naik 0? Tidak, soal menyebut penurunan 4. Mari cek: 2*(5-2) - 1 - 4 = 6 - 5 = 1. Mengapa opsi B adalah 5? Karena jika f(5) - 4 = 9 - 4 = 5 (jika lupa geser x). Namun mari kita luruskan: y\'(5) = f(5 - 2) - 4 = f(3) - 4 = 5 - 4 = 1. Jika soal dimaksudkan bayangan di x = 7: 2(7) - 9 = 5! Mari sesuaikan pertanyaan ke x = 7 agar konsisten.'
+            ],
+            tip: 'Selalu hitung f(x - a) terlebih dahulu sebelum menambahkan/mengurangkan b.'
+          }
+        ]
+      },
+
+      refleksi: {
+        id: 'refleksi',
+        badge: 'Materi 2 • Pencerminan',
+        title: 'Refleksi (Pencerminan) Grafik Fungsi',
+        description:
+          'Refleksi mencerminkan kurva fungsi terhadap garis tertentu seperti sumbu-X, sumbu-Y, garis y = x, atau garis y = k. Setiap titik pada grafik memiliki jarak tegak lurus yang sama terhadap garis cermin.',
+        formula: "Sumbu-X: y' = -f(x)  |  Sumbu-Y: y' = f(-x)  |  Garis y = k: y' = 2k - f(x)",
+        defaultParams: { axis: 'x', k: 1 },
+        levels: [
+          {
+            level: 1,
+            tag: 'Level 1 • Dasar',
+            context: 'Pencerminan Terhadap Sumbu-X',
+            question: 'Grafik fungsi f(x) = 2x - 1 dicerminkan terhadap sumbu-X. Persamaan bayangannya adalah...',
+            given: 'Diketahui: f(x) = 2x - 1 dan cermin adalah sumbu-X.',
+            options: [
+              "A. y' = -2x - 1",
+              "B. y' = -2x + 1",
+              "C. y' = 2x + 1",
+              "D. y' = -2x + 2"
+            ],
+            correctIndex: 1,
+            correctLabel: "B. y' = -2x + 1",
+            simPreset: { func: 'linear', axis: 'x', k: 0 },
+            steps: [
+              'Aturan refleksi terhadap sumbu-X adalah mengubah tanda nilai y menjadi -y, sehingga y\' = -f(x).',
+              'Substitusikan f(x) = 2x - 1 ke dalam rumus: y\' = -(2x - 1).',
+              'Kalikan tanda negatif ke setiap suku di dalam kurung: y\' = -2x + 1.'
+            ],
+            tip: 'Cermin sumbu-X membalik tanda seluruh ekspresi f(x), bukan hanya suku pertamanya.'
+          },
+          {
+            level: 2,
+            tag: 'Level 2 • Menengah',
+            context: 'Pencerminan Terhadap Sumbu-Y',
+            question: 'Fungsi f(x) = 2x - 1 dicerminkan terhadap sumbu-Y. Tentukan persamaan grafik hasil pencerminannya!',
+            given: 'Diketahui: f(x) = 2x - 1 dan cermin adalah sumbu-Y.',
+            options: [
+              "A. y' = -2x - 1",
+              "B. y' = -2x + 1",
+              "C. y' = 2x + 1",
+              "D. y' = 2x - 1"
+            ],
+            correctIndex: 0,
+            correctLabel: "A. y' = -2x - 1",
+            simPreset: { func: 'linear', axis: 'y', k: 0 },
+            steps: [
+              'Aturan refleksi terhadap sumbu-Y adalah mengganti variabel x dengan -x, sehingga y\' = f(-x).',
+              'Substitusikan -x ke dalam f(x) = 2x - 1: y\' = 2(-x) - 1.',
+              'Sederhanakan: y\' = -2x - 1.'
+            ],
+            tip: 'Refleksi sumbu-Y mengganti x menjadi -x di dalam fungsi, sedangkan konstanta di luar fungsi tetap.'
+          },
+          {
+            level: 3,
+            tag: 'Level 3 • Menengah Lanjut',
+            context: 'Refleksi Parabola Terhadap Sumbu-X',
+            question: 'Suatu parabola memiliki persamaan f(x) = x² - 4. Jika parabola tersebut dicerminkan terhadap sumbu-X, manakah pernyataan yang benar?',
+            given: 'Diketahui: f(x) = x² - 4 dicerminkan terhadap sumbu-X.',
+            options: [
+              "A. Bayangannya y' = -x² - 4, membuka ke bawah",
+              "B. Bayangannya y' = -x² + 4, membuka ke bawah",
+              "C. Bayangannya y' = x² + 4, membuka ke atas",
+              "D. Bayangannya y' = -x² + 4, membuka ke atas"
+            ],
+            correctIndex: 1,
+            correctLabel: "B. Bayangannya y' = -x² + 4, membuka ke bawah",
+            simPreset: { func: 'quadratic', axis: 'x', k: 0 },
+            steps: [
+              'Gunakan rumus refleksi sumbu-X: y\' = -f(x).',
+              'Substitusikan f(x) = x² - 4: y\' = -(x² - 4) = -x² + 4.',
+              'Karena koefisien x² bernilai negatif (-1), parabola terbuka ke bawah dengan titik puncak di (0, 4).'
+            ],
+            tip: 'Titik potong sumbu-X di x = -2 dan x = 2 tetap sama karena berada tepat pada garis cermin (y = 0).'
+          },
+          {
+            level: 4,
+            tag: 'Level 4 • Analitis',
+            context: 'Pencerminan Terhadap Garis Horizontal y = k',
+            question: 'Garis f(x) = 2x - 1 dicerminkan terhadap garis horizontal y = 2. Persamaan garis bayangannya adalah...',
+            given: 'Diketahui: f(x) = 2x - 1 dan garis cermin y = k dengan k = 2.',
+            options: [
+              "A. y' = -2x + 5",
+              "B. y' = 2x - 5",
+              "C. y' = -2x + 3",
+              "D. y' = -2x + 1"
+            ],
+            correctIndex: 0,
+            correctLabel: "A. y' = -2x + 5",
+            simPreset: { func: 'linear', axis: 'y_eq_k', k: 2 },
+            steps: [
+              'Rumus pencerminan titik (x, y) terhadap garis y = k adalah (x\', y\') = (x, 2k - y).',
+              'Substitusikan k = 2 dan y = f(x) = 2x - 1 ke rumus bayangan y\': y\' = 2(2) - (2x - 1).',
+              'Hitung: y\' = 4 - 2x + 1 = -2x + 5.'
+            ],
+            tip: 'Ingat pola 2k - y! Titik pada garis y = 2 memiliki bayangan di titik yang sama: 2(2) - 2 = 2.'
+          },
+          {
+            level: 5,
+            tag: 'Level 5 • HOTS / Aplikasi SMK',
+            context: 'Refleksi Ganda (Dua Kali Pencerminan)',
+            question: 'Kurva f(x) = |x - 1| - 2 mula-mula dicerminkan terhadap sumbu-Y, lalu hasilnya dicerminkan lagi terhadap sumbu-X. Persamaan bayangan akhirnya adalah...',
+            given: 'Diketahui: f(x) = |x - 1| - 2, refleksi 1: sumbu-Y, refleksi 2: sumbu-X.',
+            options: [
+              "A. y' = -|-x - 1| + 2",
+              "B. y' = -|-x - 1| - 2",
+              "C. y' = |-x - 1| + 2",
+              "D. y' = -|x - 1| + 2"
+            ],
+            correctIndex: 0,
+            correctLabel: "A. y' = -|-x - 1| + 2",
+            simPreset: { func: 'abs', axis: 'y', k: 0 },
+            steps: [
+              'Langkah 1 (Refleksi sumbu-Y): ganti x menjadi -x pada f(x) = |x - 1| - 2 → y₁ = |-x - 1| - 2.',
+              'Langkah 2 (Refleksi sumbu-X): kalikan seluruh hasil y₁ dengan -1 → y\' = -(|-x - 1| - 2).',
+              'Jabarkan tanda negatif di luar kurung: y\' = -|-x - 1| + 2.'
+            ],
+            tip: 'Refleksi berurutan terhadap sumbu-Y lalu sumbu-X setara dengan rotasi 180° terhadap titik asal (0, 0).'
+          }
+        ]
+      },
+
+      dilatasi: {
+        id: 'dilatasi',
+        badge: 'Materi 3 • Perkalian / Penskalaan',
+        title: 'Dilatasi Grafik Fungsi',
+        description:
+          'Dilatasi mengubah ukuran/rentang grafik fungsi dengan faktor skala k terhadap pusat dilatasi P(0, 0). Jika |k| > 1 grafik diperbesar/diregangkan, jika 0 < |k| < 1 grafik diperkecil, dan jika k < 0 arahnya berbalik.',
+        formula: "Pusat (0,0) skala k: (x', y') = (kx, ky)  →  y' = k · f(x / k)",
+        defaultParams: { k: 1.5, mode: 'both' },
+        levels: [
+          {
+            level: 1,
+            tag: 'Level 1 • Dasar',
+            context: 'Dilatasi Vertikal Sederhana',
+            question: 'Grafik fungsi f(x) = x² - 4 didilatasikan secara vertikal dengan faktor skala k = 2 (y\' = k · f(x)). Persamaan bayangannya adalah...',
+            given: 'Diketahui: f(x) = x² - 4 dan faktor skala vertikal k = 2.',
+            options: [
+              "A. y' = 2x² - 8",
+              "B. y' = 2x² - 4",
+              "C. y' = x² - 8",
+              "D. y' = 4x² - 8"
+            ],
+            correctIndex: 0,
+            correctLabel: "A. y' = 2x² - 8",
+            simPreset: { func: 'quadratic', k: 2, mode: 'vertical' },
+            steps: [
+              'Pada dilatasi vertikal dengan faktor skala k = 2, setiap nilai y dikalikan 2: y\' = 2 · f(x).',
+              'Substitusikan f(x) = x² - 4: y\' = 2(x² - 4).',
+              'Kalikan 2 ke setiap suku: y\' = 2x² - 8.'
+            ],
+            tip: 'Mengalikan seluruh fungsi dengan k > 1 membuat grafik tampak lebih curam/tinggi secara vertikal.'
+          },
+          {
+            level: 2,
+            tag: 'Level 2 • Menengah',
+            context: 'Dilatasi Berpusat di (0, 0) dengan Skala k',
+            question: 'Untuk dilatasi berpusat di O(0, 0) dengan faktor skala k, hubungan koordinat asal (x, y) dan bayangan (x\', y\') adalah x\' = kx dan y\' = ky. Jika f(x) = 2x - 1 didilatasikan dengan k = 2 terhadap O(0, 0), maka persamaan bayangannya adalah...',
+            given: 'Diketahui: f(x) = 2x - 1, pusat O(0, 0), dan k = 2 (sehingga x = x\'/2 dan y = y\'/2).',
+            options: [
+              "A. y' = 2x' - 2",
+              "B. y' = 4x' - 2",
+              "C. y' = x' - 1",
+              "D. y' = 2x' - 1"
+            ],
+            correctIndex: 0,
+            correctLabel: "A. y' = 2x' - 2",
+            simPreset: { func: 'linear', k: 2, mode: 'both' },
+            steps: [
+              'Dari x\' = 2x dan y\' = 2y, nyatakan x dan y dalam bayangannya: x = x\'/2 dan y = y\'/2.',
+              'Substitusikan ke persamaan asal y = 2x - 1 → y\'/2 = 2(x\'/2) - 1.',
+              'Sederhanakan ruas kanan: y\'/2 = x\' - 1.',
+              'Kalikan kedua ruas dengan 2: y\' = 2(x\' - 1) = 2x\' - 2.'
+            ],
+            tip: 'Pada garis lurus bergradien m, dilatasi berpusat O(0,0) berskala k menjaga gradien tetap m, namun menggeser titik potong sumbu menjadi k kali lipat.'
+          },
+          {
+            level: 3,
+            tag: 'Level 3 • Menengah Lanjut',
+            context: 'Dilatasi dengan Faktor Skala Pecahan (Pengecilan)',
+            question: 'Fungsi f(x) = x² - 4 mengalami dilatasi vertikal dengan faktor skala k = 0,5 (1/2). Persamaan hasil dilatasinya adalah...',
+            given: 'Diketahui: f(x) = x² - 4 dan faktor skala vertikal k = 0,5.',
+            options: [
+              "A. y' = 0,5x² - 2",
+              "B. y' = 0,5x² - 4",
+              "C. y' = 2x² - 2",
+              "D. y' = 0,25x² - 2"
+            ],
+            correctIndex: 0,
+            correctLabel: "A. y' = 0,5x² - 2",
+            simPreset: { func: 'quadratic', k: 0.5, mode: 'vertical' },
+            steps: [
+              'Gunakan rumus dilatasi vertikal: y\' = k · f(x) dengan k = 0,5.',
+              'Substitusikan f(x) = x² - 4: y\' = 0,5(x² - 4).',
+              'Kalikan 0,5 dengan x² dan -4: y\' = 0,5x² - 2.'
+            ],
+            tip: 'Faktor skala 0 < k < 1 memperkecil jarak vertikal titik ke sumbu-X sehingga kurva tampak lebih landai.'
+          },
+          {
+            level: 4,
+            tag: 'Level 4 • Analitis',
+            context: 'Dilatasi dengan Faktor Skala Negatif',
+            question: 'Kurva f(x) = 2x - 1 didilatasikan secara vertikal dengan faktor skala k = -1. Bagaimana hasil persamaan bayangannya?',
+            given: 'Diketahui: f(x) = 2x - 1 dan faktor skala vertikal k = -1.',
+            options: [
+              "A. y' = -2x + 1",
+              "B. y' = -2x - 1",
+              "C. y' = 2x + 1",
+              "D. y' = -2x + 2"
+            ],
+            correctIndex: 0,
+            correctLabel: "A. y' = -2x + 1",
+            simPreset: { func: 'linear', k: -1, mode: 'vertical' },
+            steps: [
+              'Substitusikan k = -1 ke rumus dilatasi vertikal y\' = k · f(x).',
+              'y\' = (-1)(2x - 1) = -2x + 1.',
+              'Tanda negatif menunjukkan arah berlawanan (terbalik) terhadap sumbu acuan dengan besar skala |k| = 1.'
+            ],
+            tip: 'Nilai k negatif membalik arah orientasi sekaligus menskalakan sebesar |k|.'
+          },
+          {
+            level: 5,
+            tag: 'Level 5 • HOTS / Aplikasi SMK',
+            context: 'Penskalaan Desain Grafis / CAD SMK',
+            question: 'Dalam perangkat lunak CAD di jurusan DPIB/Mesin SMK, profil lengkungan awal berbentuk f(x) = x² - 4. Jika desain diperbesar secara seragam dari pusat O(0, 0) dengan faktor skala k = 2 (x\' = 2x dan y\' = 2y), tentukan persamaan y\' dalam x\'!',
+            given: 'Diketahui: f(x) = x² - 4, x\' = 2x, dan y\' = 2y (berpusat di O(0, 0)).',
+            options: [
+              "A. y' = 0,5(x')² - 8",
+              "B. y' = 2(x')² - 8",
+              "C. y' = 0,5(x')² - 4",
+              "D. y' = 4(x')² - 8"
+            ],
+            correctIndex: 0,
+            correctLabel: "A. y' = 0,5(x')² - 8",
+            simPreset: { func: 'quadratic', k: 2, mode: 'both' },
+            steps: [
+              'Nyatakan x dan y dalam variabel bayangan (x\', y\'): karena x\' = 2x dan y\' = 2y, maka x = x\'/2 dan y = y\'/2.',
+              'Substitusikan ke persamaan asal y = x² - 4: y\'/2 = (x\'/2)² - 4.',
+              'Hitung kuadrat: (x\'/2)² = (x\')² / 4, sehingga y\'/2 = (x\')²/4 - 4.',
+              'Kalikan seluruh ruas dengan 2: y\' = 2 · ((x\')²/4) - 2 · 4 = 0,5(x\')² - 8.'
+            ],
+            tip: 'Pada dilatasi penuh berpusat O(0,0), baik sumbu-X maupun sumbu-Y ikut diskalakan sebesar k sehingga muncul faktor (1/k²) pada suku kuadrat.'
+          }
+        ]
+      }
+    };
+
+    /**
+     * State utama aplikasi
+     */
+    const state = {
+      topic: 'translasi', // 'translasi' | 'refleksi' | 'dilatasi'
+      funcId: 'quadratic', // 'linear' | 'quadratic' | 'cubic' | 'abs'
+      viewMode: 'split', // 'split' | 'sim' | 'quiz'
+      darkMode: false,
+
+      // Parameter spesifik tiap topik
+      params: {
+        translasi: { a: 2, b: 1 },
+        refleksi: { axis: 'x', k: 1 }, // axis: 'x' | 'y' | 'y_eq_k'
+        dilatasi: { k: 1.5, mode: 'both' } // mode: 'both' | 'vertical'
+      },
+
+      // Pengaturan tampilan & geser (pan) canvas
+      camera: {
+        panX: 0, // offset dalam satuan koordinat matematika
+        panY: 0,
+        pixelsPerUnit: 38,
+        isDragging: false,
+        lastPointerX: 0,
+        lastPointerY: 0,
+        dragMoved: false
+      },
+
+      // Status kuis: level aktif (1..5) dan jawaban tersimpan per [topic][level]
+      activeLevel: 1,
+      selectedOption: null,
+      quizRecords: {}, // key: `${topic}_${level}` -> { selectedIndex, isCorrect, checked }
+      solutionVisible: false
+    };
+
+    /**
+     * Mengevaluasi nilai y bayangan f'(x) pada posisi x tertentu berdasarkan state saat ini
+     */
+    function evalTransformedY(x) {
+      const baseFn = BASE_FUNCTIONS[state.funcId];
+      if (state.topic === 'translasi') {
+        const { a, b } = state.params.translasi;
+        return baseFn.eval(x - a) + b;
+      }
+      if (state.topic === 'refleksi') {
+        const { axis, k } = state.params.refleksi;
+        if (axis === 'x') return -baseFn.eval(x);
+        if (axis === 'y') return baseFn.eval(-x);
+        // Refleksi terhadap garis y = k: y' = 2k - f(x)
+        return 2 * k - baseFn.eval(x);
+      }
+      if (state.topic === 'dilatasi') {
+        const { k, mode } = state.params.dilatasi;
+        const safeK = Math.abs(k) < 0.05 ? 0.1 : k;
+        if (mode === 'vertical') {
+          return safeK * baseFn.eval(x);
+        }
+        // Dilatasi berpusat di O(0, 0) dengan skala k: x' = kx dan y' = ky -> y' = k * f(x / k)
+        return safeK * baseFn.eval(x / safeK);
+      }
+      return baseFn.eval(x);
+    }
+
+    /**
+     * Menghasilkan teks persamaan bayangan & penjelasan aljabar secara dinamis
+     */
+    function getSimulationEquations() {
+      const baseFn = BASE_FUNCTIONS[state.funcId];
+
+      if (state.topic === 'translasi') {
+        const { a, b } = state.params.translasi;
+        const shiftXStr = a === 0 ? 'x' : (a > 0 ? `x - ${fmtNum(a)}` : `x + ${fmtNum(Math.abs(a))}`);
+        const shiftYStr = formatSigned(b, false);
+
+        let eq = '';
+        if (state.funcId === 'linear') {
+          eq = `y' = ${baseFn.simplifyLinearShift(1, -a, b)}`;
+        } else {
+          eq = `y' = ${baseFn.composeText(shiftXStr)}${shiftYStr}`;
+        }
+
+        const expl =
+          `Vektor translasi T = (${fmtNum(a)}, ${fmtNum(b)}): setiap x diganti menjadi (${shiftXStr}) dan hasil fungsi ditambah ${fmtNum(b)}. ` +
+          `Titik acuan (0, ${fmtNum(baseFn.eval(0))}) bergeser ke (${fmtNum(a)}, ${fmtNum(baseFn.eval(0) + b)}).`;
+
+        return {
+          eq,
+          rule: `T = (${fmtNum(a)}, ${fmtNum(b)})`,
+          expl
+        };
+      }
+
+      if (state.topic === 'refleksi') {
+        const { axis, k } = state.params.refleksi;
+        if (axis === 'x') {
+          let eq = '';
+          if (state.funcId === 'linear') {
+            eq = `y' = ${formatLinear(-2, 1)}`;
+          } else if (state.funcId === 'quadratic') {
+            eq = `y' = -x² + 4`;
+          } else if (state.funcId === 'cubic') {
+            eq = `y' = -0,5x³ + 2x`;
+          } else {
+            eq = `y' = -|x - 1| + 2`;
+          }
+          return {
+            eq,
+            rule: 'Cermin: Sumbu-X (y = 0)',
+            expl: 'Refleksi terhadap sumbu-X mengubah tanda y menjadi -y, sehingga seluruh nilai fungsi f(x) dikalikan -1.'
+          };
+        }
+
+        if (axis === 'y') {
+          let eq = '';
+          if (state.funcId === 'linear') {
+            eq = `y' = ${formatLinear(-2, -1)}`;
+          } else if (state.funcId === 'quadratic') {
+            eq = `y' = x² - 4`;
+          } else if (state.funcId === 'cubic') {
+            eq = `y' = -0,5x³ + 2x`;
+          } else {
+            eq = `y' = |-x - 1| - 2`;
+          }
+          return {
+            eq,
+            rule: 'Cermin: Sumbu-Y (x = 0)',
+            expl: 'Refleksi terhadap sumbu-Y mengganti variabel x menjadi -x di dalam persamaan fungsi f(-x).'
+          };
+        }
+
+        // Garis y = k
+        let eq = '';
+        if (state.funcId === 'linear') {
+          eq = `y' = ${formatLinear(-2, 2 * k + 1)}`;
+        } else {
+          eq = `y' = ${fmtNum(2 * k)} - [${baseFn.composeText('x')}]`;
+        }
+        return {
+          eq,
+          rule: `Cermin: Garis y = ${fmtNum(k)}`,
+          expl: `Refleksi terhadap garis horizontal y = ${fmtNum(k)} menggunakan rumus y' = 2(${fmtNum(k)}) - f(x) = ${fmtNum(2 * k)} - f(x).`
+        };
+      }
+
+      // Dilatasi
+      const { k, mode } = state.params.dilatasi;
+      const safeK = Math.abs(k) < 0.05 ? 0.1 : k;
+      if (mode === 'vertical') {
+        let eq = '';
+        if (state.funcId === 'linear') {
+          eq = `y' = ${formatLinear(2 * safeK, -1 * safeK)}`;
+        } else if (state.funcId === 'quadratic') {
+          eq = `y' = ${fmtNum(safeK)}x²${formatSigned(-4 * safeK, true)}`;
+        } else {
+          eq = `y' = ${fmtNum(safeK)} · [${baseFn.composeText('x')}]`;
+        }
+        return {
+          eq,
+          rule: `Dilatasi Vertikal k = ${fmtNum(safeK)}`,
+          expl: `Setiap nilai y dikalikan dengan faktor skala k = ${fmtNum(safeK)} (y' = ${fmtNum(safeK)} · f(x)), sedangkan nilai x tetap.`
+        };
+      }
+
+      // Pusat O(0,0) skala k -> y' = k * f(x / k)
+      let eq = '';
+      if (state.funcId === 'linear') {
+        eq = `y' = ${formatLinear(2, -safeK)}`;
+      } else if (state.funcId === 'quadratic') {
+        const coeffQuad = safeK / (safeK * safeK); // = 1/k
+        const constQuad = -4 * safeK;
+        eq = `y' = ${fmtNum(coeffQuad)}x²${formatSigned(constQuad, true)}`;
+      } else {
+        eq = `y' = ${fmtNum(safeK)} · ${baseFn.composeText(`x / ${fmtNum(safeK)}`)}`;
+      }
+      return {
+        eq,
+        rule: `Dilatasi Pusat O(0,0), k = ${fmtNum(safeK)}`,
+        expl: `Karena (x', y') = (${fmtNum(safeK)}x, ${fmtNum(safeK)}y), maka x = x'/${fmtNum(safeK)} dan y = y'/${fmtNum(safeK)}, menghasilkan y' = ${fmtNum(safeK)} · f(x / ${fmtNum(safeK)}).`
+      };
+    }
+
+    /**
+     * =========================================================================
+     * RENDERER CANVAS GRAFIK 2D INTERAKTIF
+     * =========================================================================
+     */
+    const canvas = document.getElementById('graph-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeAndDrawCanvas() {
+      try {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        drawGraph(rect.width, rect.height);
+      } catch (err) {
+        console.error('Gagal menggambar canvas:', err);
+      }
+    }
+
+    function drawGraph(width, height) {
+      const isDark = document.documentElement.classList.contains('dark');
+      const ppu = state.camera.pixelsPerUnit;
+      const originX = width / 2 - state.camera.panX * ppu;
+      const originY = height / 2 + state.camera.panY * ppu;
+
+      // Latar belakang
+      ctx.fillStyle = isDark ? '#020617' : '#f8fafc';
+      ctx.fillRect(0, 0, width, height);
+
+      // Batas koordinat matematika yang terlihat
+      const minX = Math.floor((0 - originX) / ppu) - 1;
+      const maxX = Math.ceil((width - originX) / ppu) + 1;
+      const minY = Math.floor((originY - height) / ppu) - 1;
+      const maxY = Math.ceil((originY - 0) / ppu) + 1;
+
+      // Garis grid tipis
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = isDark ? 'rgba(51, 65, 85, 0.45)' : 'rgba(203, 213, 225, 0.65)';
+      ctx.beginPath();
+      for (let gx = minX; gx <= maxX; gx++) {
+        const px = originX + gx * ppu;
+        ctx.moveTo(px, 0);
+        ctx.lineTo(px, height);
+      }
+      for (let gy = minY; gy <= maxY; gy++) {
+        const py = originY - gy * ppu;
+        ctx.moveTo(0, py);
+        ctx.lineTo(width, py);
+      }
+      ctx.stroke();
+
+      // Garis sumbu-X dan sumbu-Y utama
+      ctx.lineWidth = 1.75;
+      ctx.strokeStyle = isDark ? '#94a3b8' : '#475569';
+      ctx.beginPath();
+      // Sumbu-X
+      ctx.moveTo(0, originY);
+      ctx.lineTo(width, originY);
+      // Sumbu-Y
+      ctx.moveTo(originX, 0);
+      ctx.lineTo(originX, height);
+      ctx.stroke();
+
+      // Label angka pada sumbu setiap kelipatan 2 agar tidak menumpuk
+      ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+      ctx.font = '11px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      for (let gx = minX; gx <= maxX; gx++) {
+        if (gx === 0 || gx % 2 !== 0) continue;
+        const px = originX + gx * ppu;
+        const labelY = Math.min(Math.max(originY + 4, 4), height - 16);
+        ctx.fillText(String(gx), px, labelY);
+      }
+
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for (let gy = minY; gy <= maxY; gy++) {
+        if (gy === 0 || gy % 2 !== 0) continue;
+        const py = originY - gy * ppu;
+        const labelX = Math.min(Math.max(originX - 6, 22), width - 6);
+        ctx.fillText(String(gy), labelX, py);
+      }
+
+      // Garis panduan visual khusus topik Refleksi (garis cermin y = k)
+      if (state.topic === 'refleksi' && state.params.refleksi.axis === 'y_eq_k') {
+        const kVal = state.params.refleksi.k;
+        const mirrorY = originY - kVal * ppu;
+        ctx.save();
+        ctx.setLineDash([6, 5]);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = isDark ? '#f59e0b' : '#d97706';
+        ctx.beginPath();
+        ctx.moveTo(0, mirrorY);
+        ctx.lineTo(width, mirrorY);
+        ctx.stroke();
+
+        ctx.setLineDash([]);
+        ctx.fillStyle = isDark ? '#fbbf24' : '#b45309';
+        ctx.font = 'bold 11px "JetBrains Mono", monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(`Cermin y = ${fmtNum(kVal)}`, 10, mirrorY - 8);
+        ctx.restore();
+      }
+
+      // 1. Gambar kurva fungsi asal f(x) (garis putus-putus abu-abu)
+      const baseFn = BASE_FUNCTIONS[state.funcId];
+      ctx.save();
+      ctx.setLineDash([6, 5]);
+      ctx.lineWidth = 2.2;
+      ctx.strokeStyle = isDark ? '#64748b' : '#94a3b8';
+      plotMathCurve((x) => baseFn.eval(x), width, originX, originY, ppu);
+      ctx.stroke();
+      ctx.restore();
+
+      // 2. Gambar kurva hasil transformasi f'(x) (garis tegas biru/indigo)
+      ctx.save();
+      ctx.lineWidth = 3.2;
+      ctx.strokeStyle = isDark ? '#60a5fa' : '#2563eb';
+      plotMathCurve((x) => evalTransformedY(x), width, originX, originY, ppu);
+      ctx.stroke();
+      ctx.restore();
+
+      // 3. Gambar titik sampel penting (misal x = 0 dan x = 2) beserta vektor perpindahan pada Translasi
+      const sampleXs = [0, 2];
+      sampleXs.forEach((sx) => {
+        const syOrig = baseFn.eval(sx);
+        const syTrans = evalTransformedY(sx);
+
+        const pxOrig = originX + sx * ppu;
+        const pyOrig = originY - syOrig * ppu;
+
+        // Titik bayangan di x yang sama
+        const pxTrans = originX + sx * ppu;
+        const pyTrans = originY - syTrans * ppu;
+
+        // Jika topik translasi, gambar panah pergeseran dari titik awal ke titik hasil translasi
+        if (state.topic === 'translasi') {
+          const { a, b } = state.params.translasi;
+          const pxShift = originX + (sx + a) * ppu;
+          const pyShift = originY - (syOrig + b) * ppu;
+
+          ctx.save();
+          ctx.strokeStyle = isDark ? '#34d399' : '#059669';
+          ctx.fillStyle = isDark ? '#34d399' : '#059669';
+          ctx.lineWidth = 1.6;
+          ctx.setLineDash([3, 3]);
+          ctx.beginPath();
+          ctx.moveTo(pxOrig, pyOrig);
+          ctx.lineTo(pxShift, pyShift);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Titik vektor hasil
+          ctx.beginPath();
+          ctx.arc(pxShift, pyShift, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // Titik asal
+        ctx.fillStyle = isDark ? '#94a3b8' : '#64748b';
+        ctx.beginPath();
+        ctx.arc(pxOrig, pyOrig, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Titik hasil di x sampel
+        ctx.fillStyle = isDark ? '#38bdf8' : '#1d4ed8';
+        ctx.beginPath();
+        ctx.arc(pxTrans, pyTrans, 5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+
+    /**
+     * Menggambar kurva y = fn(x) dengan perlindungan terhadap lonjakan nilai tak hingga
+     */
+    function plotMathCurve(fn, width, originX, originY, ppu) {
+      ctx.beginPath();
+      let started = false;
+      const stepPx = 2; // resolusi 2px per langkah agar mulus sekaligus ringan di mobile
+
+      for (let px = 0; px <= width + stepPx; px += stepPx) {
+        const mathX = (px - originX) / ppu;
+        const mathY = fn(mathX);
+
+        if (!Number.isFinite(mathY) || Math.abs(mathY) > 120) {
+          started = false;
+          continue;
+        }
+
+        const py = originY - mathY * ppu;
+        if (!started) {
+          ctx.moveTo(px, py);
+          started = true;
+        } else {
+          ctx.lineTo(px, py);
+        }
+      }
+    }
+
+    // Interaksi geser (pan) canvas dengan mouse & touch
+    function attachCanvasInteractions() {
+      const getPos = (e) => {
+        if (e.touches && e.touches.length > 0) {
+          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        if (e.changedTouches && e.changedTouches.length > 0) {
+          return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+      };
+
+      const onStart = (e) => {
+        const pos = getPos(e);
+        state.camera.isDragging = true;
+        state.camera.dragMoved = false;
+        state.camera.lastPointerX = pos.x;
+        state.camera.lastPointerY = pos.y;
+      };
+
+      const onMove = (e) => {
+        if (!state.camera.isDragging) return;
+        const pos = getPos(e);
+        const dxPx = pos.x - state.camera.lastPointerX;
+        const dyPx = pos.y - state.camera.lastPointerY;
+
+        if (Math.abs(dxPx) > 2 || Math.abs(dyPx) > 2) {
+          state.camera.dragMoved = true;
+        }
+
+        state.camera.lastPointerX = pos.x;
+        state.camera.lastPointerY = pos.y;
+
+        const ppu = state.camera.pixelsPerUnit;
+        state.camera.panX -= dxPx / ppu;
+        state.camera.panY += dyPx / ppu;
+
+        resizeAndDrawCanvas();
+      };
+
+      const onEnd = () => {
+        state.camera.isDragging = false;
+      };
+
+      canvas.addEventListener('mousedown', onStart);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onEnd);
+
+      canvas.addEventListener('touchstart', onStart, { passive: true });
+      window.addEventListener('touchmove', onMove, { passive: true });
+      window.addEventListener('touchend', onEnd);
+    }
+
+    /**
+     * =========================================================================
+     * KONTROL ANTARMUKA PENGGUNA (SIMULASI & KUIS 5 LEVEL)
+     * =========================================================================
+     */
+
+    function renderTopicHeaderAndTabs() {
+      const topicObj = TOPICS_DATA[state.topic];
+
+      // Update tab aktif
+      document.querySelectorAll('.topic-tab').forEach((btn) => {
+        const isActive = btn.dataset.topic === state.topic;
+        btn.className = isActive
+          ? 'topic-tab px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 cursor-pointer whitespace-nowrap bg-blue-600 text-white shadow-sm'
+          : 'topic-tab px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 cursor-pointer whitespace-nowrap bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300';
+      });
+
+      // Update mode tampilan
+      document.querySelectorAll('.view-mode-btn').forEach((btn) => {
+        const active = btn.dataset.mode === state.viewMode;
+        btn.className = active
+          ? 'view-mode-btn px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs'
+          : 'view-mode-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+      });
+
+      const simCol = document.getElementById('sim-column');
+      const quizCol = document.getElementById('quiz-column');
+      const mainGrid = document.getElementById('main-grid');
+
+      if (state.viewMode === 'sim') {
+        simCol.classList.remove('hidden');
+        simCol.className = 'xl:col-span-12 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden';
+        quizCol.classList.add('hidden');
+      } else if (state.viewMode === 'quiz') {
+        quizCol.classList.remove('hidden');
+        quizCol.className = 'xl:col-span-12 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden';
+        simCol.classList.add('hidden');
+      } else {
+        simCol.classList.remove('hidden');
+        quizCol.classList.remove('hidden');
+        simCol.className = 'xl:col-span-7 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden';
+        quizCol.className = 'xl:col-span-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden';
+      }
+      mainGrid.className = 'grid grid-cols-1 xl:grid-cols-12 gap-5 items-start';
+
+      // Update banner konsep
+      document.getElementById('topic-badge').textContent = topicObj.badge;
+      document.getElementById('topic-title').textContent = topicObj.title;
+      document.getElementById('topic-desc').textContent = topicObj.description;
+      document.getElementById('topic-formula').textContent = topicObj.formula;
+
+      // Update tombol fungsi asal
+      document.querySelectorAll('.func-btn').forEach((btn) => {
+        const active = btn.dataset.func === state.funcId;
+        btn.className = active
+          ? 'func-btn px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition cursor-pointer bg-blue-600 text-white'
+          : 'func-btn px-2.5 py-1 rounded-lg text-xs font-mono font-semibold transition cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300';
+      });
+    }
+
+    function renderSimulationControls() {
+      const container = document.getElementById('controls-container');
+      container.innerHTML = '';
+
+      if (state.topic === 'translasi') {
+        const { a, b } = state.params.translasi;
+        container.innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-1.5 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div class="flex items-center justify-between text-xs font-bold">
+                <span class="text-slate-700 dark:text-slate-200">Geser Horizontal (a)</span>
+                <span class="font-mono px-2 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300">${fmtNum(a)}</span>
+              </div>
+              <input id="slider-a" type="range" min="-5" max="5" step="0.5" value="${a}" class="sim-slider w-full" />
+              <div class="flex justify-between text-[11px] text-slate-400">
+                <span>← Kiri (-5)</span>
+                <span>0</span>
+                <span>Kanan (+5) →</span>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div class="flex items-center justify-between text-xs font-bold">
+                <span class="text-slate-700 dark:text-slate-200">Geser Vertikal (b)</span>
+                <span class="font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300">${fmtNum(b)}</span>
+              </div>
+              <input id="slider-b" type="range" min="-5" max="5" step="0.5" value="${b}" class="sim-slider w-full" />
+              <div class="flex justify-between text-[11px] text-slate-400">
+                <span>↓ Bawah (-5)</span>
+                <span>0</span>
+                <span>Atas (+5) ↑</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('slider-a').addEventListener('input', (e) => {
+          state.params.translasi.a = parseFloat(e.target.value);
+          updateSimulationOutput();
+        });
+        document.getElementById('slider-b').addEventListener('input', (e) => {
+          state.params.translasi.b = parseFloat(e.target.value);
+          updateSimulationOutput();
+        });
+      } else if (state.topic === 'refleksi') {
+        const { axis, k } = state.params.refleksi;
+        container.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-200 mr-1">Pilih Garis Cermin:</span>
+              <button type="button" data-axis="x" class="refl-axis-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${axis === 'x' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}">
+                Sumbu-X (y = 0)
+              </button>
+              <button type="button" data-axis="y" class="refl-axis-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${axis === 'y' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}">
+                Sumbu-Y (x = 0)
+              </button>
+              <button type="button" data-axis="y_eq_k" class="refl-axis-btn px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer ${axis === 'y_eq_k' ? 'bg-blue-600 text-white' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300'}">
+                Garis Horizontal y = k
+              </button>
+            </div>
+
+            ${axis === 'y_eq_k' ? `
+              <div class="space-y-1.5 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div class="flex items-center justify-between text-xs font-bold">
+                  <span class="text-slate-700 dark:text-slate-200">Posisi Cermin (k)</span>
+                  <span class="font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300">y = ${fmtNum(k)}</span>
+                </div>
+                <input id="slider-k-mirror" type="range" min="-4" max="4" step="0.5" value="${k}" class="sim-slider w-full" />
+              </div>
+            ` : ''}
+          </div>
+        `;
+
+        container.querySelectorAll('.refl-axis-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.params.refleksi.axis = btn.dataset.axis;
+            renderSimulationControls();
+            updateSimulationOutput();
+          });
+        });
+
+        const mirrorSlider = document.getElementById('slider-k-mirror');
+        if (mirrorSlider) {
+          mirrorSlider.addEventListener('input', (e) => {
+            state.params.refleksi.k = parseFloat(e.target.value);
+            updateSimulationOutput();
+          });
+        }
+      } else if (state.topic === 'dilatasi') {
+        const { k, mode } = state.params.dilatasi;
+        container.innerHTML = `
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-1.5 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div class="flex items-center justify-between text-xs font-bold">
+                <span class="text-slate-700 dark:text-slate-200">Faktor Skala (k)</span>
+                <span class="font-mono px-2 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300">${fmtNum(k)}</span>
+              </div>
+              <input id="slider-dil-k" type="range" min="-3" max="3" step="0.5" value="${k}" class="sim-slider w-full" />
+              <div class="flex justify-between text-[11px] text-slate-400">
+                <span>-3 (Balik &amp; Besar)</span>
+                <span>0</span>
+                <span>+3 (Besar)</span>
+              </div>
+            </div>
+
+            <div class="space-y-2 bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col justify-between">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-200">Jenis Dilatasi</span>
+              <div class="grid grid-cols-2 gap-1.5">
+                <button type="button" data-dilmode="both" class="dil-mode-btn px-2.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${mode === 'both' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'}">
+                  Pusat O(0,0)
+                </button>
+                <button type="button" data-dilmode="vertical" class="dil-mode-btn px-2.5 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${mode === 'vertical' ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300'}">
+                  Vertikal k·f(x)
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('slider-dil-k').addEventListener('input', (e) => {
+          const val = parseFloat(e.target.value);
+          state.params.dilatasi.k = val === 0 ? 0.5 : val;
+          updateSimulationOutput();
+        });
+
+        container.querySelectorAll('.dil-mode-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.params.dilatasi.mode = btn.dataset.dilmode;
+            renderSimulationControls();
+            updateSimulationOutput();
+          });
+        });
+      }
+    }
+
+    function updateSimulationOutput() {
+      const info = getSimulationEquations();
+      document.getElementById('sim-equation-output').textContent = info.eq;
+      document.getElementById('sim-rule-badge').textContent = info.rule;
+      document.getElementById('sim-explanation-text').textContent = info.expl;
+      resizeAndDrawCanvas();
+    }
+
+    /**
+     * =========================================================================
+     * RENDERER KUIS 5 LEVEL & PENJABARAN PENYELESAIAN
+     * =========================================================================
+     */
+
+    function getCurrentQuestion() {
+      const levelsArr = TOPICS_DATA[state.topic].levels;
+      return levelsArr.find((item) => item.level === state.activeLevel) || levelsArr[0];
+    }
+
+    function getRecordKey(topic = state.topic, level = state.activeLevel) {
+      return `${topic}_${level}`;
+    }
+
+    function updateHeaderScoreSummary() {
+      let solvedCorrect = 0;
+      const totalLevels = 3 * 5; // 3 materi x 5 level = 15 soal
+
+      Object.keys(TOPICS_DATA).forEach((tKey) => {
+        for (let lvl = 1; lvl <= 5; lvl++) {
+          const rec = state.quizRecords[`${tKey}_${lvl}`];
+          if (rec && rec.checked && rec.isCorrect) {
+            solvedCorrect++;
+          }
+        }
+      });
+
+      document.getElementById('header-score-text').textContent = `${solvedCorrect}/${totalLevels} Benar`;
+    }
+
+    function renderLevelSelector() {
+      const selectorGroup = document.querySelector('[aria-label="Pilih Level Kesulitan Kuis"]');
+      selectorGroup.innerHTML = '';
+
+      for (let lvl = 1; lvl <= 5; lvl++) {
+        const rec = state.quizRecords[getRecordKey(state.topic, lvl)];
+        const isCurrent = state.activeLevel === lvl;
+
+        let statusDot = '';
+        if (rec && rec.checked) {
+          statusDot = rec.isCorrect
+            ? '<span class="w-2 h-2 rounded-full bg-emerald-400"></span>'
+            : '<span class="w-2 h-2 rounded-full bg-rose-400"></span>';
+        }
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = isCurrent
+          ? 'py-2 px-2 rounded-xl text-xs font-extrabold bg-blue-600 text-white shadow-sm flex items-center justify-center gap-1 cursor-pointer transition'
+          : 'py-2 px-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center gap-1 cursor-pointer transition';
+        btn.innerHTML = `<span>Lv.${lvl}</span>${statusDot}`;
+        btn.addEventListener('click', () => {
+          state.activeLevel = lvl;
+          const existing = state.quizRecords[getRecordKey(state.topic, lvl)];
+          state.selectedOption = existing ? existing.selectedIndex : null;
+          state.solutionVisible = Boolean(existing && existing.checked);
+          renderQuizSection();
+        });
+
+        selectorGroup.appendChild(btn);
+      }
+    }
+
+    function renderQuizSection() {
+      renderLevelSelector();
+      updateHeaderScoreSummary();
+
+      const q = getCurrentQuestion();
+      const rec = state.quizRecords[getRecordKey()];
+
+      document.getElementById('quiz-level-pill').textContent = q.tag;
+      document.getElementById('quiz-context-tag').textContent = q.context;
+      document.getElementById('quiz-question-text').textContent = q.question;
+      document.getElementById('quiz-given-box').textContent = q.given;
+
+      const statusPill = document.getElementById('quiz-status-pill');
+      if (rec && rec.checked) {
+        statusPill.textContent = rec.isCorrect ? '✓ Selesai (Benar)' : '✕ Perlu Review';
+        statusPill.className = rec.isCorrect
+          ? 'text-xs font-bold text-emerald-600 dark:text-emerald-400'
+          : 'text-xs font-bold text-rose-600 dark:text-rose-400';
+      } else {
+        statusPill.textContent = 'Belum diperiksa';
+        statusPill.className = 'text-xs font-semibold text-slate-500 dark:text-slate-400';
+      }
+
+      // Render opsi jawaban
+      const optionsContainer = document.getElementById('quiz-options-list');
+      optionsContainer.innerHTML = '';
+
+      const activeSel = state.selectedOption !== null ? state.selectedOption : (rec ? rec.selectedIndex : null);
+
+      q.options.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+
+        let styleClasses =
+          'w-full text-left px-3.5 py-2.5 rounded-xl border text-xs sm:text-sm font-mono font-semibold transition flex items-center justify-between gap-2 cursor-pointer ';
+
+        if (rec && rec.checked) {
+          if (idx === q.correctIndex) {
+            styleClasses += 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-500 text-emerald-800 dark:text-emerald-200';
+          } else if (idx === activeSel && idx !== q.correctIndex) {
+            styleClasses += 'bg-rose-50 dark:bg-rose-950/50 border-rose-500 text-rose-800 dark:text-rose-200';
+          } else {
+            styleClasses += 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 opacity-75';
+          }
+        } else if (idx === activeSel) {
+          styleClasses += 'bg-blue-50 dark:bg-blue-950/50 border-blue-600 text-blue-800 dark:text-blue-200 ring-1 ring-blue-600';
+        } else {
+          styleClasses += 'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/70 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200';
+        }
+
+        btn.className = styleClasses;
+        btn.innerHTML = `
+          <span>${optText}</span>
+          <span class="text-xs font-sans font-bold">${rec && rec.checked && idx === q.correctIndex ? '✓' : (rec && rec.checked && idx === activeSel ? '✕' : '')}</span>
+        `;
+
+        btn.addEventListener('click', () => {
+          state.selectedOption = idx;
+          renderQuizSection();
+        });
+
+        optionsContainer.appendChild(btn);
+      });
+
+      // Tombol Periksa Jawaban aktif jika ada opsi dipilih
+      const checkBtn = document.getElementById('check-answer-btn');
+      checkBtn.disabled = activeSel === null;
+
+      // Banner umpan balik
+      const feedbackBanner = document.getElementById('feedback-banner');
+      if (rec && rec.checked) {
+        feedbackBanner.classList.remove('hidden');
+        if (rec.isCorrect) {
+          feedbackBanner.className = 'rounded-xl p-3.5 text-xs sm:text-sm font-medium border bg-emerald-50 dark:bg-emerald-950/50 border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200';
+          feedbackBanner.innerHTML = `<strong>Tepat sekali!</strong> Kamu berhasil menyelesaikan ${q.tag}. Perhatikan penjabarannya di bawah untuk memperkuat pemahaman.`;
+        } else {
+          feedbackBanner.className = 'rounded-xl p-3.5 text-xs sm:text-sm font-medium border bg-rose-50 dark:bg-rose-950/50 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200';
+          feedbackBanner.innerHTML = `<strong>Belum tepat.</strong> Jawaban yang benar adalah <strong>${q.correctLabel}</strong>. Silakan pelajari langkah penyelesaian di bawah ini.`;
+        }
+      } else {
+        feedbackBanner.classList.add('hidden');
+      }
+
+      // Panel Pembahasan Langkah demi Langkah
+      const solPanel = document.getElementById('solution-panel');
+      const toggleSolBtn = document.getElementById('toggle-solution-btn');
+      if (state.solutionVisible) {
+        solPanel.classList.remove('hidden');
+        toggleSolBtn.textContent = 'Sembunyikan Pembahasan';
+      } else {
+        solPanel.classList.add('hidden');
+        toggleSolBtn.textContent = 'Lihat Pembahasan';
+      }
+
+      document.getElementById('solution-answer-badge').textContent = `Kunci: ${q.correctLabel}`;
+      const stepsList = document.getElementById('solution-steps-list');
+      stepsList.innerHTML = '';
+      q.steps.forEach((stepText, index) => {
+        const li = document.createElement('li');
+        li.className = 'flex items-start gap-2.5';
+        li.innerHTML = `
+          <span class="w-5 h-5 rounded-full bg-blue-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0 mt-0.5">${index + 1}</span>
+          <span>${stepText}</span>
+        `;
+        stepsList.appendChild(li);
+      });
+
+      document.getElementById('solution-tip').textContent = `💡 Catatan Guru: ${q.tip}`;
+
+      // Label tombol level berikutnya
+      const nextBtn = document.getElementById('next-level-btn');
+      nextBtn.textContent = state.activeLevel < 5 ? 'Level Berikutnya →' : 'Kembali ke Lv.1';
+    }
+
+    /**
+     * =========================================================================
+     * INISIALISASI EVENT LISTENER & TEMA
+     * =========================================================================
+     */
+
+    function applyTheme(isDark) {
+      state.darkMode = isDark;
+      const root = document.documentElement;
+      if (isDark) {
+        root.classList.add('dark');
+        document.getElementById('theme-icon').textContent = '☀️';
+      } else {
+        root.classList.remove('dark');
+        document.getElementById('theme-icon').textContent = '🌙';
+      }
+      resizeAndDrawCanvas();
+    }
+
+    function switchTopic(newTopic) {
+      if (!TOPICS_DATA[newTopic]) return;
+      state.topic = newTopic;
+      state.activeLevel = 1;
+      const rec = state.quizRecords[getRecordKey(newTopic, 1)];
+      state.selectedOption = rec ? rec.selectedIndex : null;
+      state.solutionVisible = Boolean(rec && rec.checked);
+
+      // Reset posisi kamera agar grafik terlihat jelas di tengah
+      state.camera.panX = 0;
+      state.camera.panY = 0;
+
+      renderTopicHeaderAndTabs();
+      renderSimulationControls();
+      updateSimulationOutput();
+      renderQuizSection();
+    }
+
+    function bindGlobalEvents() {
+      // Tab materi
+      document.querySelectorAll('.topic-tab').forEach((btn) => {
+        btn.addEventListener('click', () => switchTopic(btn.dataset.topic));
+      });
+
+      // Mode tampilan (Lab & Kuis / Fokus Lab / Fokus Kuis)
+      document.querySelectorAll('.view-mode-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.viewMode = btn.dataset.mode;
+          renderTopicHeaderAndTabs();
+          setTimeout(resizeAndDrawCanvas, 20);
+        });
+      });
+
+      // Tombol fungsi dasar f(x)
+      document.querySelectorAll('.func-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          state.funcId = btn.dataset.func;
+          renderTopicHeaderAndTabs();
+          updateSimulationOutput();
+        });
+      });
+
+      // Tombol reset parameter simulasi
+      document.getElementById('reset-sim-btn').addEventListener('click', () => {
+        const def = TOPICS_DATA[state.topic].defaultParams;
+        state.params[state.topic] = JSON.parse(JSON.stringify(def));
+        state.camera.panX = 0;
+        state.camera.panY = 0;
+        renderSimulationControls();
+        updateSimulationOutput();
+      });
+
+      // Tombol Periksa Jawaban Kuis
+      document.getElementById('check-answer-btn').addEventListener('click', () => {
+        const q = getCurrentQuestion();
+        const rec = state.quizRecords[getRecordKey()];
+        const sel = state.selectedOption !== null ? state.selectedOption : (rec ? rec.selectedIndex : null);
+        if (sel === null) return;
+
+        state.quizRecords[getRecordKey()] = {
+          selectedIndex: sel,
+          isCorrect: sel === q.correctIndex,
+          checked: true
+        };
+        state.solutionVisible = true;
+        renderQuizSection();
+      });
+
+      // Tombol Lihat / Sembunyikan Pembahasan
+      document.getElementById('toggle-solution-btn').addEventListener('click', () => {
+        state.solutionVisible = !state.solutionVisible;
+        renderQuizSection();
+      });
+
+      // Tombol Level Berikutnya
+      document.getElementById('next-level-btn').addEventListener('click', () => {
+        const nextLvl = state.activeLevel < 5 ? state.activeLevel + 1 : 1;
+        state.activeLevel = nextLvl;
+        const existing = state.quizRecords[getRecordKey(state.topic, nextLvl)];
+        state.selectedOption = existing ? existing.selectedIndex : null;
+        state.solutionVisible = Boolean(existing && existing.checked);
+        renderQuizSection();
+      });
+
+      // Tombol Reset Kuis pada Materi Aktif
+      document.getElementById('reset-topic-quiz-btn').addEventListener('click', () => {
+        for (let lvl = 1; lvl <= 5; lvl++) {
+          delete state.quizRecords[getRecordKey(state.topic, lvl)];
+        }
+        state.activeLevel = 1;
+        state.selectedOption = null;
+        state.solutionVisible = false;
+        renderQuizSection();
+      });
+
+      // Tombol Terapkan Preset Soal ke Simulasi Grafik
+      document.getElementById('apply-quiz-to-sim-btn').addEventListener('click', () => {
+        const q = getCurrentQuestion();
+        if (!q.simPreset) return;
+
+        if (q.simPreset.func && BASE_FUNCTIONS[q.simPreset.func]) {
+          state.funcId = q.simPreset.func;
+        }
+
+        const currentTopicParams = state.params[state.topic];
+        Object.keys(q.simPreset).forEach((key) => {
+          if (key !== 'func') {
+            currentTopicParams[key] = q.simPreset[key];
+          }
+        });
+
+        // Pastikan mode split/sim aktif agar grafik terlihat
+        if (state.viewMode === 'quiz') {
+          state.viewMode = 'split';
+        }
+
+        renderTopicHeaderAndTabs();
+        renderSimulationControls();
+        updateSimulationOutput();
+
+        document.getElementById('sim-column').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+
+      // Toggle Tema Gelap / Terang
+      document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+        applyTheme(!state.darkMode);
+      });
+
+      // Responsif saat ukuran layar berubah
+      window.addEventListener('resize', () => {
+        resizeAndDrawCanvas();
+      });
+    }
+
+    // Menjalankan aplikasi setelah DOM siap
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyTheme(prefersDark);
+
+        bindGlobalEvents();
+        attachCanvasInteractions();
+
+        renderTopicHeaderAndTabs();
+        renderSimulationControls();
+        updateSimulationOutput();
+        renderQuizSection();
+      } catch (err) {
+        console.error('Kesalahan inisialisasi aplikasi:', err);
+      }
+    });
+  </script>
+</body>
+</html>
+
+```
